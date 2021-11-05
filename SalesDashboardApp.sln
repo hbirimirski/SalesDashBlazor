@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30406.217
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SalesDashboardBlazor", "SalesDashboardBlazor\SalesDashboardBlazor.csproj", "{DF9212C1-7D2E-4201-A3AD-08A38133C1A4}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DataAccessLib", "DataAccessLib\DataAccessLib.csproj", "{7D9B1EF8-D6E9-4086-8D5A-FF9EF6A885EE}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{DF9212C1-7D2E-4201-A3AD-08A38133C1A4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DF9212C1-7D2E-4201-A3AD-08A38133C1A4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DF9212C1-7D2E-4201-A3AD-08A38133C1A4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DF9212C1-7D2E-4201-A3AD-08A38133C1A4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7D9B1EF8-D6E9-4086-8D5A-FF9EF6A885EE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7D9B1EF8-D6E9-4086-8D5A-FF9EF6A885EE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7D9B1EF8-D6E9-4086-8D5A-FF9EF6A885EE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7D9B1EF8-D6E9-4086-8D5A-FF9EF6A885EE}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {3AF25339-70D4-4617-8053-B57352584251}
+	EndGlobalSection
+EndGlobal
