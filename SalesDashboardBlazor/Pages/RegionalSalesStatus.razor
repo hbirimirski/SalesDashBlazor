@@ -1,0 +1,299 @@
+﻿@page "/RegionalSalesStatus"
+@using Microsoft.JSInterop;
+@inject IJSRuntime JS
+@using SalesDashboardBlazor.Services
+@using SalesDashboardBlazor.Models
+@inject ProductsAndOrdersService ProductsAndOrdersService
+@using Telerik.Blazor
+
+<style>
+    .sparkline-container > .k-chart > svg > g > g > g:not([clip-path]) {
+        display: none;
+    }
+</style>
+
+<TelerikNotification @ref="@NotificationReference" Class="MyTelerikNotification"></TelerikNotification>
+
+<div id="main-section-header" class="row">
+    <h2 id="team-efficiency" class="col-md-3">Regional sales status</h2>
+    <div id="dateFilter" class="col-md-9">
+        <div class="row">
+            <div class="col-sm-4 col-md-6 col-lg-6 period-wrapper">
+            </div>
+            <div class="col-sm-4 col-md-6 col-lg-3 period-wrapper">
+                <span>FROM</span>
+                <TelerikDatePicker @bind-Value="@startDate" Id="startDate"></TelerikDatePicker>
+            </div>
+            <div class="col-sm-4 col-md-6 col-lg-3 period-wrapper">
+                <span>TO</span>
+                <TelerikDatePicker @bind-Value="@endDate" Id="endDate"></TelerikDatePicker>
+            </div>
+        </div>
+    </div>
+    <div style="clear: both;"></div>
+</div>
+
+<div id="regional-sales" class="main-section-content row no-gutter">
+    <div class="col-xs-12">
+        <div id="map-wrapper" class="row no-gutter">
+            <div id="map-details" class="col-md-2">
+                <h3 class="section-header hidden-xs hidden-sm">Pick a Country to view stats</h3>
+                <h3 class="section-header">COUNTRY</h3>
+                <h2 id="countryName"></h2>
+                <h3 class="section-header">CUSTOMERS</h3>
+                <div id="countryCustomers"><span></span></div>
+            </div>
+            <div id="map-container" class="col-md-10">
+                <div id="map"></div>
+            </div>
+        </div>
+
+        <div id="statsContainer" class="row">
+            <div id="marketShareContainer" class="col-md-3 stats-graph">
+                <h3 class="section-header">Market share</h3>
+                <span id="MarketShareLabel" class="stats-label">@marketShareViewModel.CountryPercent</span>
+                <div class="sparkline-container-pie">
+
+                    <TelerikChart Height="150px">
+                        <ChartTitle></ChartTitle>
+                        <ChartLegend Visible="false"></ChartLegend>
+
+                        <ChartSeriesItems>
+                            <ChartSeries ColorField="@nameof(MarketShareModelData.SegmentColor)"
+                                         Type="ChartSeriesType.Pie"
+                                         Data="@marketShareViewModel.Data"
+                                         Field="@nameof(MarketShareModelData.Percentage)"
+                                         CategoryField="@nameof(MarketShareModelData.Source)"
+                                         ExplodeField="@nameof(MarketShareModelData.Explode)">
+                                <ChartSeriesTooltip Visible="true" Context="item">
+                                    <Template>
+                                        @marketShareViewModel.Country
+                                    </Template>
+                                </ChartSeriesTooltip>
+                                <ChartSeriesLabels Visible="false"></ChartSeriesLabels>
+                            </ChartSeries>
+                        </ChartSeriesItems>
+                    </TelerikChart>
+
+                    @if (marketShareViewModel.Country == null)
+                    {
+                        <div id="MarketShareNoData" class="overlay">
+                            <div>No data available</div>
+                        </div>
+                    }
+                </div>
+            </div>
+            <div id="revenueContainer" class="col-md-3 stats-graph">
+                <h3 class="section-header">Revenue</h3>
+                <span id="RevenueLabel" class="stats-label">@marketShareViewModel.Country</span>
+                <div class="sparkline-container">
+
+                    <TelerikChart Height="100px">
+                        <ChartTooltip Visible="true"></ChartTooltip>
+                        <ChartLegend Visible="false"></ChartLegend>
+
+                        <ChartSeriesItems>
+                            <ChartSeries VisibleInLegendField="false" Type="ChartSeriesType.Column"
+                                         Gap="0.2" Color="#47ABE9"
+                                         Data="@revenuesViewModel.Value"
+                                         Field="@nameof(DateValueViewModel.Value)">
+                            </ChartSeries>
+                        </ChartSeriesItems>
+                        <ChartCategoryAxes>
+                            <ChartCategoryAxis Visible="false" Categories="@revenuesViewModel.Date"></ChartCategoryAxis>
+                        </ChartCategoryAxes>
+                    </TelerikChart>
+
+                    @if (revenuesViewModel.Value == null)
+                    {
+                        <div id="RevenueNoData" class="overlay">
+                            <div>No data available</div>
+                        </div>
+                    }
+                </div>
+            </div>
+            <div id="ordersContainer" class="col-md-3 stats-graph">
+                <h3 class="section-header">Orders</h3>
+                <span id="OrdersLabel" class="stats-label">@ordersViewModel.Value?.Count</span>
+                <div class="sparkline-container">
+
+                    <TelerikChart Height="100px">
+                        <ChartTooltip Visible="true"></ChartTooltip>
+                        <ChartLegend Visible="false"></ChartLegend>
+
+                        <ChartSeriesItems>
+                            <ChartSeries VisibleInLegendField="false" Type="ChartSeriesType.Column"
+                                         Gap="0.2" Color="#47ABE9"
+                                         Data="@ordersViewModel.Value"
+                                         Field="@nameof(DateValueViewModel.Value)">
+                            </ChartSeries>
+                        </ChartSeriesItems>
+                        <ChartCategoryAxes>
+                            <ChartCategoryAxis Visible="false" Categories="@ordersViewModel.Date"></ChartCategoryAxis>
+                        </ChartCategoryAxes>
+                    </TelerikChart>
+
+                    @if (ordersViewModel.Value == null)
+                    {
+                        <div id="OrdersNoData" class="overlay">
+                            <div>No data available</div>
+                        </div>
+                    }
+
+                </div>
+            </div>
+            <div id="customersContainer" class="col-md-3 stats-graph">
+                <h3 class="section-header">Customers</h3>
+                <span id="CustomersLabel" class="stats-label">@customersViewModel.Value?.Count</span>
+                <div class="sparkline-container">
+
+                    <TelerikChart Height="100px">
+                        <ChartTooltip Visible="true"></ChartTooltip>
+                        <ChartLegend Visible="false"></ChartLegend>
+
+                        <ChartSeriesItems>
+                            <ChartSeries VisibleInLegendField="false" Type="ChartSeriesType.Column"
+                                         Gap="0.2" Color="#47ABE9"
+                                         Data="@customersViewModel.Value"
+                                         Field="@nameof(DateValueViewModel.Value)">
+                            </ChartSeries>
+                        </ChartSeriesItems>
+                        <ChartCategoryAxes>
+                            <ChartCategoryAxis Visible="false" Categories="@customersViewModel.Date"></ChartCategoryAxis>
+                        </ChartCategoryAxes>
+                    </TelerikChart>
+
+                    @if (customersViewModel.Value == null)
+                    {
+                        <div id="CustomersNoData" class="overlay">
+                            <div>No data available</div>
+                        </div>
+                    }
+
+                </div>
+            </div>
+        </div>
+
+        <div id="topProductsContainer" class="row">
+            <div class="col-xs-12">
+                <h3 class="section-header">Top selling products</h3>
+                <div class="sparkline-container">
+                    <TelerikChart>
+                        <ChartTitle Text="Gross domestic product growth /GDP annual %/"></ChartTitle>
+                        <ChartTooltip Visible="true"></ChartTooltip>
+                        <ChartLegend Position="ChartLegendPosition.Bottom"></ChartLegend>
+
+                        <ChartSeriesItems>
+                            <ChartSeries Type="ChartSeriesType.Line" Name="Chile" Data="@DataLast" Field="@nameof(ModelDataLast.Series1)"></ChartSeries>
+                            <ChartSeries Type="ChartSeriesType.Line" Name="India" Data="@DataLast" Field="@nameof(ModelDataLast.Series2)"></ChartSeries>
+                            <ChartSeries Type="ChartSeriesType.Line" Name="Haiti" Data="@DataLast" Field="@nameof(ModelDataLast.Series3)"></ChartSeries>
+                        </ChartSeriesItems>
+
+                        <ChartCategoryAxes>
+                            <ChartCategoryAxis Categories="@Categories"></ChartCategoryAxis>
+                        </ChartCategoryAxes>
+
+                        <ChartValueAxes>
+                            <ChartValueAxis AxisCrossingValue="@AxisCrossingValue">
+                                <ChartValueAxisLabels Format="{0}%"></ChartValueAxisLabels>
+                            </ChartValueAxis>
+                        </ChartValueAxes>
+
+                    </TelerikChart>
+
+                    <div id="ProductsNoData" class="overlay">
+                        <div>No data available</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<button id="myBtn" style="visibility:hidden;" class="btn btn-primary" @onclick="PopulateCharts">Click me</button>
+
+
+@code {
+    public class ModelDataLast
+    {
+        public double Series1 { get; set; }
+        public double Series2 { get; set; }
+        public double Series3 { get; set; }
+    }
+
+    public string[] Categories = new string[] { "2008", "2009", "2010", "2011" };
+
+    public object[] AxisCrossingValue = new object[] { -10 };
+
+    public List<ModelDataLast> DataLast = new List<ModelDataLast>()
+{
+        new ModelDataLast()
+        {
+            Series1 = 3.907,
+            Series2 = 1.988,
+            Series3 = -0.253
+        },
+        new ModelDataLast()
+        {
+            Series1 = 7.943,
+            Series2 = 2.733,
+            Series3 = 0.362
+        },
+        new ModelDataLast()
+        {
+            Series1 = 7.848,
+            Series2 = 3.994,
+            Series3 = -3.519
+        },
+        new ModelDataLast()
+        {
+            Series1 = 9.284,
+            Series2 = 3.464,
+            Series3 = 1.799
+        }
+    };
+
+
+    DateValueViewModel revenuesViewModel = new DateValueViewModel();
+    DateValueViewModel ordersViewModel = new DateValueViewModel();
+    DateValueViewModel customersViewModel = new DateValueViewModel();
+    MarketShareViewModel marketShareViewModel = new MarketShareViewModel();
+    public TelerikNotification NotificationReference { get; set; }
+
+    private DateTime startDate = new DateTime(1996, 1, 1);
+    private DateTime endDate = new DateTime(1998, 1, 1);
+
+    public void AddNotification()
+    {
+        NotificationReference.Show(new NotificationModel()
+        {
+            Text = "Auto Closable Notification",
+            ThemeColor = "Primary"
+        });
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await JS.InvokeAsync<string>("createMap");
+        }
+    }
+
+    [JSInvokable]
+    public static Task GetCountryCustomers(string selectedCountry)
+    {
+        string result = ProductsAndOrdersService.GetCompanies(selectedCountry);
+        return Task.FromResult(result);
+    }
+
+    public async Task PopulateCharts()
+    {
+        var selectedCountry = await JS.InvokeAsync<string>("getSelectedCountry");
+        revenuesViewModel = ProductsAndOrdersService.GetRevenue(startDate, endDate, selectedCountry);
+        ordersViewModel = ProductsAndOrdersService.GetOrders(startDate, endDate, selectedCountry);
+        customersViewModel = ProductsAndOrdersService.GetCustomers(startDate, endDate, selectedCountry);
+        marketShareViewModel = ProductsAndOrdersService.GetMarketShare(startDate, endDate, selectedCountry);
+    }
+
+}

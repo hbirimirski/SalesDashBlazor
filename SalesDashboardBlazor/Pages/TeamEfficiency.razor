@@ -1,0 +1,259 @@
+﻿@page "/TeamEfficiency"
+
+@using SalesDashboardBlazor.Services
+@using SalesDashboardBlazor.Models
+@using Telerik.Blazor
+@inject ProductsAndOrdersService ProductsAndOrdersService
+
+<style>
+    .employee.selected {
+        background: #6abd2d;
+    }
+
+    .k-chart > svg > g > g > g:not([clip-path]) {
+        display: none;
+    }
+</style>
+
+<TelerikTooltip TargetSelector="p a[title]">
+</TelerikTooltip>
+
+<div id="main-section-header" class="row">
+    <h2 id="team-efficiency" class="col-md-3">Team Efficiency</h2>
+    <div id="dateFilter" class="col-md-9">
+        <div class="row">
+            <div class="col-sm-4 col-md-6 col-lg-6 period-wrapper">
+            </div>
+            <div class="col-sm-4 col-md-6 col-lg-3 period-wrapper">
+                <span>FROM</span>
+                <TelerikDatePicker @bind-Value="@startDate" Id="startDate"></TelerikDatePicker>
+            </div>
+            <div class="col-sm-4 col-md-6 col-lg-3 period-wrapper">
+                <span>TO</span>
+                <TelerikDatePicker @bind-Value="@endDate" Id="endDate"></TelerikDatePicker>
+            </div>
+        </div>
+    </div>
+    <div style="clear: both;"></div>
+</div>
+
+<div id="employees-content" class="main-section-content row">
+    <div id="employee-list" class="col-md-2">
+        <h3>TEAM MEMBERS</h3>
+        @foreach (var employee in employees)
+        {
+            <div class="employee @employee.Selected">
+                <div class="employee-wrapper" @onclick="(() => EmployeeClick(employee))">
+                    <img src="/Content/Employees/@(String.Format("{0}{1}", employee.EmployeeID, ".png"))" class="img-responsive employee-list-image" />
+                    <dl class="employee-list-details">
+                        <dt class="name">@employee.EmployeeName</dt>
+                        <dd class="title">@employee.Title</dd>
+                    </dl>
+                </div>
+            </div>
+        }
+    </div>
+    <div id="employee-details-wrapper" class="col-md-10">
+        <div id="employee-details" class="row">
+            <div id="employee-about" class="col-xs-12 placeholder">
+                <div class="row">
+                    <div id="employeeBio" class="col-md-4">
+                        <div>
+                            <h3>ABOUT</h3>
+                            <img src="/Content/Employees/@(String.Format("{0}{1}", selectedEmployee.EmployeeID, ".png"))" class="img-responsive employee-details-image" />
+                            <dl class="employee-bio-details">
+                                <dt class="name">@selectedEmployee.EmployeeName</dt>
+                                <dd class="title">@selectedEmployee.Title</dd>
+                                <dd class="phone">@selectedEmployee.HomePhone</dd>
+                                <dd>
+                                    <p><a title="@selectedEmployee.Notes">FULL BIO</a></p>
+                                </dd>
+                            </dl>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <h3>Quarter to date sales</h3>
+                        <span id="EmployeeQuarterSalesLabel">$ @quarterToDateSales.FirstOrDefault().Current.ToString("0.00")</span>
+                        <div class="sparkline-container">
+                            <TelerikChart Height="50px">
+                                <ChartTooltip Visible="true"></ChartTooltip>
+                                <ChartLegend Visible="false"></ChartLegend>
+                                <ChartSeriesItems>
+                                    <ChartSeries VisibleInLegend="false"
+                                                 VisibleInLegendField="false"
+                                                 Type="ChartSeriesType.Bar"
+                                                 Data="@EmployeeQuarterData"
+                                                 Color="green">
+                                    </ChartSeries>
+                                </ChartSeriesItems>
+
+                                <ChartValueAxes>
+                                    <ChartValueAxis Max="30000"></ChartValueAxis>
+                                </ChartValueAxes>
+
+                                <ChartCategoryAxes>
+                                    <ChartCategoryAxis Categories="@Categories"></ChartCategoryAxis>
+                                </ChartCategoryAxes>
+
+                            </TelerikChart>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <h3>Monthly Average Sales</h3>
+                        <span id="EmployeeAverageSalesLabel">$ @employeeAverageSales.FirstOrDefault().EmployeeSales.ToString("0.00")</span>
+                        <div class="sparkline-container">
+
+                            <TelerikChart Height="50px">
+                                <ChartSeriesItems>
+                                    <ChartSeries Style="Telerik.Blazor.ChartSeriesStyle.Smooth" Type="ChartSeriesType.Line" Data="@employeeAverageSalesData" Field="@nameof(ModelData.Series1)" Color="green">
+                                        <ChartSeriesMarkers Visible="false"></ChartSeriesMarkers>
+                                    </ChartSeries>
+                                </ChartSeriesItems>
+                                <ChartCategoryAxes>
+                                    <ChartCategoryAxis Categories="@Categories"></ChartCategoryAxis>
+                                </ChartCategoryAxes>
+                                <ChartValueAxes>
+                                    <ChartValueAxis AxisCrossingValue="@AxisCrossingValue">
+                                        <ChartValueAxisLabels Format="{0}%"></ChartValueAxisLabels>
+                                    </ChartValueAxis>
+                                </ChartValueAxes>
+
+                            </TelerikChart>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div id="employeeStats" class="col-xs-12">
+                <h3>REPRESENTATIVE SALES VS. TOTAL SALES</h3>
+
+                <TelerikChart Height="200px">
+                    <ChartTooltip Visible="true"></ChartTooltip>
+                    <ChartTitle Text="Gross domestic product growth /GDP annual %/"></ChartTitle>
+                    <ChartLegend Visible="false"></ChartLegend>
+
+                    <ChartSeriesItems>
+                        <ChartSeries Type="ChartSeriesType.Column" Color="#59AF6B" Data="@employeeComparisonData" Field="@nameof(ModelDataComparison.Series1)"></ChartSeries>
+                        <ChartSeries Type="ChartSeriesType.Column" Color="#A5C933" Data="@employeeComparisonData" Field="@nameof(ModelDataComparison.Series2)"></ChartSeries>
+                    </ChartSeriesItems>
+
+                    <ChartCategoryAxes>
+                        <ChartCategoryAxis Categories="@ColumnChartCategories"></ChartCategoryAxis>
+                    </ChartCategoryAxes>
+                </TelerikChart>
+
+            </div>
+            <div id="employeeSchedule" class="col-xs-12">
+                <h3>Representative orders - schedule</h3>
+
+                <TelerikScheduler Data="@Appointments" @bind-Date="@StartDate" Height="600px" @bind-View="@CurrView"
+                                  AllowCreate="true" AllowDelete="true" AllowUpdate="true"
+                                  ConfirmDelete="true"
+                                  IdField="@(nameof(AppointmentDto.Id))"
+                                  StartField="@(nameof(AppointmentDto.Start))"
+                                  EndField="@(nameof(AppointmentDto.End))"
+                                  TitleField="@(nameof(AppointmentDto.Title))"
+                                  DescriptionField="@(nameof(AppointmentDto.Description))"
+                                  IsAllDayField="@(nameof(AppointmentDto.IsAllDay))"
+                                  RecurrenceRuleField="@(nameof(AppointmentDto.RecurrenceRule))"
+                                  RecurrenceExceptionsField="@(nameof(AppointmentDto.RecurrenceExceptions))"
+                                  RecurrenceIdField="@(nameof(AppointmentDto.RecurrenceId))">
+                    <SchedulerViews>
+                        <SchedulerDayView StartTime="@DayStart" EndTime="@DayEnd" WorkDayStart="@WorkDayStart" WorkDayEnd="@WorkDayEnd" />
+                        <SchedulerWeekView StartTime="@DayStart" EndTime="@DayEnd" WorkDayStart="@WorkDayStart" WorkDayEnd="@WorkDayEnd" />
+                        <SchedulerMultiDayView StartTime="@DayStart" EndTime="@DayEnd" WorkDayStart="@WorkDayStart" WorkDayEnd="@WorkDayEnd" NumberOfDays="10" />
+                        <SchedulerMonthView></SchedulerMonthView>
+                        <SchedulerTimelineView StartTime="@DayStart" EndTime="@DayEnd" WorkDayStart="@WorkDayStart" WorkDayEnd="@WorkDayEnd" />
+                    </SchedulerViews>
+                </TelerikScheduler>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+
+    IEnumerable<AppointmentDto> Appointments = new List<AppointmentDto>();
+    public DateTime StartDate { get; set; } = new DateTime(2021, 6, 21);
+    public SchedulerView CurrView { get; set; } = SchedulerView.Week;
+
+    //the time portions are important
+    public DateTime DayStart { get; set; } = new DateTime(2000, 1, 1, 8, 0, 0);
+    public DateTime DayEnd { get; set; } = new DateTime(2000, 1, 1, 20, 0, 0);
+    public DateTime WorkDayStart { get; set; } = new DateTime(2000, 1, 1, 9, 0, 0);
+    public DateTime WorkDayEnd { get; set; } = new DateTime(2000, 1, 1, 17, 0, 0);
+
+
+    public class ModelData
+    {
+        public double Series1 { get; set; }
+    }
+
+    public class ModelDataComparison
+    {
+        public double Series1 { get; set; }
+        public double Series2 { get; set; }
+    }
+
+    public string[] ColumnChartCategories = new string[] { };
+
+    public List<ModelData> employeeAverageSalesData = new List<ModelData>();
+    public List<ModelDataComparison> employeeComparisonData = new List<ModelDataComparison>();
+
+    public List<object> EmployeeQuarterData = new List<object>();
+    public string[] Categories = new string[] { "" };
+    public object[] AxisCrossingValue = new object[] { -10 };
+
+    private DateTime startDate = new DateTime(1996, 1, 1);
+    private DateTime endDate = new DateTime(1998, 1, 1);
+    List<EmployeeViewModel> employees = new List<EmployeeViewModel>();
+    List<QuarterToDateSalesViewModel> quarterToDateSales = new List<QuarterToDateSalesViewModel>();
+    List<EmployeeAverageSalesViewModel> employeeAverageSales = new List<EmployeeAverageSalesViewModel>();
+    EmployeeViewModel selectedEmployee = new EmployeeViewModel();
+
+    protected override async Task OnInitializedAsync()
+    {
+        SetEmployeeQuarterData(0);
+        employees = ProductsAndOrdersService.GetEmployeesList();
+        await EmployeeClick(employees.FirstOrDefault());
+    }
+
+    public async Task EmployeeClick(EmployeeViewModel employee)
+    {
+        employees = employees.Select(c => { c.Selected = ""; return c; }).ToList();
+
+        employee.Selected = "selected";
+        selectedEmployee = employee;
+
+        quarterToDateSales = ProductsAndOrdersService.GetEmployeeQuarterSales(employee.EmployeeID, endDate);
+        employeeAverageSales = ProductsAndOrdersService.GetEmployeeAverageSales(employee.EmployeeID, startDate, endDate);
+
+        List<string> list = new List<string>();
+
+        foreach (var item in employeeAverageSales)
+        {
+            employeeAverageSalesData.Add(new ModelData
+            {
+                Series1 = Convert.ToDouble(item.EmployeeSales)
+            });
+
+            employeeComparisonData.Add(new ModelDataComparison
+            {
+                Series1 = Convert.ToDouble(item.TotalSales),
+                Series2 = Convert.ToDouble(item.EmployeeSales)
+            });
+
+
+            list.Add(item.Date.ToShortDateString());
+        }
+        ColumnChartCategories = list.ToArray();
+
+        SetEmployeeQuarterData(Convert.ToInt32(quarterToDateSales.FirstOrDefault().Current));
+    }
+
+    public void SetEmployeeQuarterData(int value)
+    {
+        EmployeeQuarterData.Clear();
+        EmployeeQuarterData.Add(value);
+    }
+}
