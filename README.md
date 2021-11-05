@@ -4,6 +4,6 @@ Application works with MS SQL database. Northwind database has to be (database b
 
 .net5 is required
 
-Build as Blazor server
--better debugging
--hosting independent 
+Build as Blazor server <br />
+-better debugging <br />
+-hosting independent <br /> 
