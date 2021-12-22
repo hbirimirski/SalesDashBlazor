@@ -3,17 +3,7 @@
 @using SalesDashboardBlazor.Services
 @using SalesDashboardBlazor.Models
 @using Telerik.Blazor
-@inject ProductsAndOrdersService ProductsAndOrdersService
-
-<style>
-    .employee.selected {
-        background: #6abd2d;
-    }
-
-    .k-chart > svg > g > g > g:not([clip-path]) {
-        display: none;
-    }
-</style>
+@inject IProductsAndOrdersService ProductsAndOrdersService
 
 <TelerikTooltip TargetSelector="p a[title]">
 </TelerikTooltip>
@@ -40,17 +30,24 @@
 <div id="employees-content" class="main-section-content row">
     <div id="employee-list" class="col-md-2">
         <h3>TEAM MEMBERS</h3>
-        @foreach (var employee in employees)
+        @if (employees.Count == 0)
         {
-            <div class="employee @employee.Selected">
-                <div class="employee-wrapper" @onclick="(() => EmployeeClick(employee))">
-                    <img src="/Content/Employees/@(String.Format("{0}{1}", employee.EmployeeID, ".png"))" class="img-responsive employee-list-image" />
-                    <dl class="employee-list-details">
-                        <dt class="name">@employee.EmployeeName</dt>
-                        <dd class="title">@employee.Title</dd>
-                    </dl>
+            <p><em>Loading...</em></p>
+        }
+        else
+        {
+            @foreach (var employee in employees)
+            {
+                <div class="employee @employee.Selected">
+                    <div class="employee-wrapper" @onclick="(() => EmployeeClick(employee))">
+                        <img src="/Content/Employees/@(String.Format("{0}{1}", employee.EmployeeID, ".png"))" class="img-responsive employee-list-image" />
+                        <dl class="employee-list-details">
+                            <dt class="name">@employee.EmployeeName</dt>
+                            <dd class="title">@employee.Title</dd>
+                        </dl>
+                    </div>
                 </div>
-            </div>
+            }
         }
     </div>
     <div id="employee-details-wrapper" class="col-md-10">
@@ -73,99 +70,125 @@
                     </div>
                     <div class="col-md-4">
                         <h3>Quarter to date sales</h3>
-                        <span id="EmployeeQuarterSalesLabel">$ @quarterToDateSales.FirstOrDefault().Current.ToString("0.00")</span>
-                        <div class="sparkline-container">
-                            <TelerikChart Height="50px">
-                                <ChartTooltip Visible="true"></ChartTooltip>
-                                <ChartLegend Visible="false"></ChartLegend>
-                                <ChartSeriesItems>
-                                    <ChartSeries VisibleInLegend="false"
-                                                 VisibleInLegendField="false"
-                                                 Type="ChartSeriesType.Bar"
-                                                 Data="@EmployeeQuarterData"
-                                                 Color="green">
-                                    </ChartSeries>
-                                </ChartSeriesItems>
+                        @if (quarterToDateSales.Count == 0)
+                        {
+                            <p><em>Loading...</em></p>
+                        }
+                        else
+                        {
+                            <span id="EmployeeQuarterSalesLabel">$ @quarterToDateSales.FirstOrDefault().Current.ToString("0.00")</span>
+                            <div class="sparkline-container">
+                                <TelerikChart Height="50px">
+                                    <ChartTooltip Visible="true"></ChartTooltip>
+                                    <ChartLegend Visible="false"></ChartLegend>
+                                    <ChartSeriesItems>
+                                        <ChartSeries VisibleInLegend="false"
+                                                     VisibleInLegendField="false"
+                                                     Type="ChartSeriesType.Bar"
+                                                     Data="@EmployeeQuarterData"
+                                                     Color="green">
+                                        </ChartSeries>
+                                    </ChartSeriesItems>
 
-                                <ChartValueAxes>
-                                    <ChartValueAxis Max="30000"></ChartValueAxis>
-                                </ChartValueAxes>
+                                    <ChartValueAxes>
+                                        <ChartValueAxis Max="30000"></ChartValueAxis>
+                                    </ChartValueAxes>
 
-                                <ChartCategoryAxes>
-                                    <ChartCategoryAxis Categories="@Categories"></ChartCategoryAxis>
-                                </ChartCategoryAxes>
+                                    <ChartCategoryAxes>
+                                        <ChartCategoryAxis Categories="@Categories"></ChartCategoryAxis>
+                                    </ChartCategoryAxes>
 
-                            </TelerikChart>
-                        </div>
+                                </TelerikChart>
+                            </div>
+                        }
                     </div>
                     <div class="col-md-4">
                         <h3>Monthly Average Sales</h3>
-                        <span id="EmployeeAverageSalesLabel">$ @employeeAverageSales.FirstOrDefault().EmployeeSales.ToString("0.00")</span>
-                        <div class="sparkline-container">
+                        @if (employeeAverageSales.Count == 0)
+                        {
+                            <p><em>Loading...</em></p>
+                        }
+                        else
+                        {
+                            <span id="EmployeeAverageSalesLabel">$ @employeeAverageSales.FirstOrDefault().EmployeeSales.ToString("0.00")</span>
+                            <div class="sparkline-container">
 
-                            <TelerikChart Height="50px">
-                                <ChartSeriesItems>
-                                    <ChartSeries Style="Telerik.Blazor.ChartSeriesStyle.Smooth" Type="ChartSeriesType.Line" Data="@employeeAverageSalesData" Field="@nameof(ModelData.Series1)" Color="green">
-                                        <ChartSeriesMarkers Visible="false"></ChartSeriesMarkers>
-                                    </ChartSeries>
-                                </ChartSeriesItems>
-                                <ChartCategoryAxes>
-                                    <ChartCategoryAxis Categories="@Categories"></ChartCategoryAxis>
-                                </ChartCategoryAxes>
-                                <ChartValueAxes>
-                                    <ChartValueAxis AxisCrossingValue="@AxisCrossingValue">
-                                        <ChartValueAxisLabels Format="{0}%"></ChartValueAxisLabels>
-                                    </ChartValueAxis>
-                                </ChartValueAxes>
+                                <TelerikChart Height="50px">
+                                    <ChartSeriesItems>
+                                        <ChartSeries Style="Telerik.Blazor.ChartSeriesStyle.Smooth" Type="ChartSeriesType.Line" Data="@employeeAverageSalesData" Field="@nameof(ModelData.Series1)" Color="green">
+                                            <ChartSeriesMarkers Visible="false"></ChartSeriesMarkers>
+                                        </ChartSeries>
+                                    </ChartSeriesItems>
+                                    <ChartCategoryAxes>
+                                        <ChartCategoryAxis Categories="@Categories"></ChartCategoryAxis>
+                                    </ChartCategoryAxes>
+                                    <ChartValueAxes>
+                                        <ChartValueAxis AxisCrossingValue="@AxisCrossingValue">
+                                            <ChartValueAxisLabels Format="{0}%"></ChartValueAxisLabels>
+                                        </ChartValueAxis>
+                                    </ChartValueAxes>
 
-                            </TelerikChart>
+                                </TelerikChart>
 
-                        </div>
+                            </div>
+                        }
                     </div>
                 </div>
             </div>
             <div id="employeeStats" class="col-xs-12">
                 <h3>REPRESENTATIVE SALES VS. TOTAL SALES</h3>
+                @if (employeeComparisonData.Count == 0)
+                {
+                    <p><em>Loading...</em></p>
+                }
+                else
+                {
+                    <TelerikChart Height="200px">
+                        <ChartTooltip Visible="true"></ChartTooltip>
+                        <ChartTitle Text="Gross domestic product growth /GDP annual %/"></ChartTitle>
+                        <ChartLegend Visible="false"></ChartLegend>
 
-                <TelerikChart Height="200px">
-                    <ChartTooltip Visible="true"></ChartTooltip>
-                    <ChartTitle Text="Gross domestic product growth /GDP annual %/"></ChartTitle>
-                    <ChartLegend Visible="false"></ChartLegend>
+                        <ChartSeriesItems>
+                            <ChartSeries Type="ChartSeriesType.Column" Color="#59AF6B" Data="@employeeComparisonData" Field="@nameof(ModelDataComparison.Series1)"></ChartSeries>
+                            <ChartSeries Type="ChartSeriesType.Column" Color="#A5C933" Data="@employeeComparisonData" Field="@nameof(ModelDataComparison.Series2)"></ChartSeries>
+                        </ChartSeriesItems>
 
-                    <ChartSeriesItems>
-                        <ChartSeries Type="ChartSeriesType.Column" Color="#59AF6B" Data="@employeeComparisonData" Field="@nameof(ModelDataComparison.Series1)"></ChartSeries>
-                        <ChartSeries Type="ChartSeriesType.Column" Color="#A5C933" Data="@employeeComparisonData" Field="@nameof(ModelDataComparison.Series2)"></ChartSeries>
-                    </ChartSeriesItems>
-
-                    <ChartCategoryAxes>
-                        <ChartCategoryAxis Categories="@ColumnChartCategories"></ChartCategoryAxis>
-                    </ChartCategoryAxes>
-                </TelerikChart>
+                        <ChartCategoryAxes>
+                            <ChartCategoryAxis Categories="@ColumnChartCategories"></ChartCategoryAxis>
+                        </ChartCategoryAxes>
+                    </TelerikChart>
+                }
 
             </div>
             <div id="employeeSchedule" class="col-xs-12">
                 <h3>Representative orders - schedule</h3>
-
-                <TelerikScheduler Data="@Appointments" @bind-Date="@StartDate" Height="600px" @bind-View="@CurrView"
-                                  AllowCreate="true" AllowDelete="true" AllowUpdate="true"
-                                  ConfirmDelete="true"
-                                  IdField="@(nameof(AppointmentDto.Id))"
-                                  StartField="@(nameof(AppointmentDto.Start))"
-                                  EndField="@(nameof(AppointmentDto.End))"
-                                  TitleField="@(nameof(AppointmentDto.Title))"
-                                  DescriptionField="@(nameof(AppointmentDto.Description))"
-                                  IsAllDayField="@(nameof(AppointmentDto.IsAllDay))"
-                                  RecurrenceRuleField="@(nameof(AppointmentDto.RecurrenceRule))"
-                                  RecurrenceExceptionsField="@(nameof(AppointmentDto.RecurrenceExceptions))"
-                                  RecurrenceIdField="@(nameof(AppointmentDto.RecurrenceId))">
-                    <SchedulerViews>
-                        <SchedulerDayView StartTime="@DayStart" EndTime="@DayEnd" WorkDayStart="@WorkDayStart" WorkDayEnd="@WorkDayEnd" />
-                        <SchedulerWeekView StartTime="@DayStart" EndTime="@DayEnd" WorkDayStart="@WorkDayStart" WorkDayEnd="@WorkDayEnd" />
-                        <SchedulerMultiDayView StartTime="@DayStart" EndTime="@DayEnd" WorkDayStart="@WorkDayStart" WorkDayEnd="@WorkDayEnd" NumberOfDays="10" />
-                        <SchedulerMonthView></SchedulerMonthView>
-                        <SchedulerTimelineView StartTime="@DayStart" EndTime="@DayEnd" WorkDayStart="@WorkDayStart" WorkDayEnd="@WorkDayEnd" />
-                    </SchedulerViews>
-                </TelerikScheduler>
+                @if (Appointments.Count() == 0)
+                {
+                    <p><em>Loading...</em></p>
+                }
+                else
+                {
+                    <TelerikScheduler Data="@Appointments" @bind-Date="@StartDate" Height="600px" @bind-View="@CurrView"
+                                      AllowCreate="true" AllowDelete="true" AllowUpdate="true"
+                                      ConfirmDelete="true"
+                                      IdField="@(nameof(AppointmentDto.Id))"
+                                      StartField="@(nameof(AppointmentDto.Start))"
+                                      EndField="@(nameof(AppointmentDto.End))"
+                                      TitleField="@(nameof(AppointmentDto.Title))"
+                                      DescriptionField="@(nameof(AppointmentDto.Description))"
+                                      IsAllDayField="@(nameof(AppointmentDto.IsAllDay))"
+                                      RecurrenceRuleField="@(nameof(AppointmentDto.RecurrenceRule))"
+                                      RecurrenceExceptionsField="@(nameof(AppointmentDto.RecurrenceExceptions))"
+                                      RecurrenceIdField="@(nameof(AppointmentDto.RecurrenceId))">
+                        <SchedulerViews>
+                            <SchedulerDayView StartTime="@DayStart" EndTime="@DayEnd" WorkDayStart="@WorkDayStart" WorkDayEnd="@WorkDayEnd" />
+                            <SchedulerWeekView StartTime="@DayStart" EndTime="@DayEnd" WorkDayStart="@WorkDayStart" WorkDayEnd="@WorkDayEnd" />
+                            <SchedulerMultiDayView StartTime="@DayStart" EndTime="@DayEnd" WorkDayStart="@WorkDayStart" WorkDayEnd="@WorkDayEnd" NumberOfDays="10" />
+                            <SchedulerMonthView></SchedulerMonthView>
+                            <SchedulerTimelineView StartTime="@DayStart" EndTime="@DayEnd" WorkDayStart="@WorkDayStart" WorkDayEnd="@WorkDayEnd" />
+                        </SchedulerViews>
+                    </TelerikScheduler>
+                }
             </div>
         </div>
     </div>
@@ -214,7 +237,7 @@
     protected override async Task OnInitializedAsync()
     {
         SetEmployeeQuarterData(0);
-        employees = ProductsAndOrdersService.GetEmployeesList();
+        employees = await ProductsAndOrdersService.GetEmployeesList();
         await EmployeeClick(employees.FirstOrDefault());
     }
 
@@ -246,9 +269,13 @@
 
             list.Add(item.Date.ToShortDateString());
         }
+
         ColumnChartCategories = list.ToArray();
 
-        SetEmployeeQuarterData(Convert.ToInt32(quarterToDateSales.FirstOrDefault().Current));
+        if (quarterToDateSales.Count > 0)
+        {
+            SetEmployeeQuarterData(Convert.ToInt32(quarterToDateSales.FirstOrDefault().Current));
+        }
     }
 
     public void SetEmployeeQuarterData(int value)

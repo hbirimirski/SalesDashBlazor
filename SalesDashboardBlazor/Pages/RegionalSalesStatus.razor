@@ -3,19 +3,15 @@
 @inject IJSRuntime JS
 @using SalesDashboardBlazor.Services
 @using SalesDashboardBlazor.Models
-@inject ProductsAndOrdersService ProductsAndOrdersService
+@inject IProductsAndOrdersService ProductsAndOrdersService
 @using Telerik.Blazor
+@inject ITelerikStringLocalizer Localizer
 
-<style>
-    .sparkline-container > .k-chart > svg > g > g > g:not([clip-path]) {
-        display: none;
-    }
-</style>
 
 <TelerikNotification @ref="@NotificationReference" Class="MyTelerikNotification"></TelerikNotification>
 
 <div id="main-section-header" class="row">
-    <h2 id="team-efficiency" class="col-md-3">Regional sales status</h2>
+    <h2 id="team-efficiency" class="col-md-3">@Localizer["RegionalStatus"]</h2>
     <div id="dateFilter" class="col-md-9">
         <div class="row">
             <div class="col-sm-4 col-md-6 col-lg-6 period-wrapper">
@@ -184,9 +180,9 @@
                         <ChartLegend Position="ChartLegendPosition.Bottom"></ChartLegend>
 
                         <ChartSeriesItems>
-                            <ChartSeries Type="ChartSeriesType.Line" Name="Chile" Data="@DataLast" Field="@nameof(ModelDataLast.Series1)"></ChartSeries>
-                            <ChartSeries Type="ChartSeriesType.Line" Name="India" Data="@DataLast" Field="@nameof(ModelDataLast.Series2)"></ChartSeries>
-                            <ChartSeries Type="ChartSeriesType.Line" Name="Haiti" Data="@DataLast" Field="@nameof(ModelDataLast.Series3)"></ChartSeries>
+                            <ChartSeries Type="ChartSeriesType.Line" Name="Chile" Data="@DataLast" Field="@nameof(ModelDataLast.ChilieSeriesData)"></ChartSeries>
+                            <ChartSeries Type="ChartSeriesType.Line" Name="India" Data="@DataLast" Field="@nameof(ModelDataLast.IndiaSeriesData)"></ChartSeries>
+                            <ChartSeries Type="ChartSeriesType.Line" Name="Haiti" Data="@DataLast" Field="@nameof(ModelDataLast.HaitiSeriesData)"></ChartSeries>
                         </ChartSeriesItems>
 
                         <ChartCategoryAxes>
@@ -216,10 +212,12 @@
 @code {
     public class ModelDataLast
     {
-        public double Series1 { get; set; }
-        public double Series2 { get; set; }
-        public double Series3 { get; set; }
+        public double ChilieSeriesData { get; set; }
+        public double IndiaSeriesData { get; set; }
+        public double HaitiSeriesData { get; set; }
     }
+
+    public string companies = string.Empty;
 
     public string[] Categories = new string[] { "2008", "2009", "2010", "2011" };
 
@@ -229,27 +227,27 @@
 {
         new ModelDataLast()
         {
-            Series1 = 3.907,
-            Series2 = 1.988,
-            Series3 = -0.253
+            ChilieSeriesData = 3.907,
+            IndiaSeriesData = 1.988,
+            HaitiSeriesData = -0.253
         },
         new ModelDataLast()
         {
-            Series1 = 7.943,
-            Series2 = 2.733,
-            Series3 = 0.362
+            ChilieSeriesData = 7.943,
+            IndiaSeriesData = 2.733,
+            HaitiSeriesData = 0.362
         },
         new ModelDataLast()
         {
-            Series1 = 7.848,
-            Series2 = 3.994,
-            Series3 = -3.519
+            ChilieSeriesData = 7.848,
+            IndiaSeriesData = 3.994,
+            HaitiSeriesData = -3.519
         },
         new ModelDataLast()
         {
-            Series1 = 9.284,
-            Series2 = 3.464,
-            Series3 = 1.799
+            ChilieSeriesData = 9.284,
+            IndiaSeriesData = 3.464,
+            HaitiSeriesData = 1.799
         }
     };
 
@@ -281,10 +279,10 @@
     }
 
     [JSInvokable]
-    public static Task GetCountryCustomers(string selectedCountry)
+    public Task GetCountryCustomers(string selectedCountry)
     {
-        string result = ProductsAndOrdersService.GetCompanies(selectedCountry);
-        return Task.FromResult(result);
+        companies = ProductsAndOrdersService.GetCompanies(selectedCountry);
+        return Task.FromResult(companies);
     }
 
     public async Task PopulateCharts()

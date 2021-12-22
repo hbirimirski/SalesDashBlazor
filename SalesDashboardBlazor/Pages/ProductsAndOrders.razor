@@ -2,35 +2,8 @@
 
 @using SalesDashboardBlazor.Services
 @using SalesDashboardBlazor.Models
-@inject ProductsAndOrdersService ProductsAndOrdersService
+@inject IProductsAndOrdersService ProductsAndOrdersService
 @using Telerik.Blazor
-
-<style>
-    .k-chart > svg > g > g > g:not([clip-path]) {
-        display: none;
-    }
-
-    .container-fluid {
-        display: flex;
-    }
-
-    .stretch {
-        flex: 1;
-        display: flex;
-        align-items: stretch;
-        align-content: stretch;
-        flex-direction: column;
-    }
-
-
-    .productsGrid {
-        height: 100%;
-    }
-
-        .productsGrid .rgDataDiv {
-            height: calc(100% - 123px) !important;
-        }
-</style>
 
 <div id="main-section" class="col-xs-12 column stretch">
     <div id="main-section-header" class="row">
@@ -38,7 +11,7 @@
     </div>
 </div>
 
-<TelerikGrid Data="@lOrders" Height="100%"
+<TelerikGrid Data="@orders" Height="100%"
              Pageable="true" Sortable="true"
              FilterMode="Telerik.Blazor.GridFilterMode.FilterRow"
              Resizable="true" Reorderable="true" PageSize="20" OnRowExpand="@OnRowExpandHandler" Context="context">
@@ -54,10 +27,10 @@
     <DetailTemplate>
         Details for order #  @context.OrderID
 
-        <TelerikTabStrip @ref="myTabStrip">
+        <TelerikTabStrip @ref="orderDetailsTabStrip">
             <TabStripTab Title="Products">
 
-                <TelerikGrid Data="@lOrderDetails" Pageable="true" PageSize="5" OnRowExpand="@GetProductDetails" Context="details">
+                <TelerikGrid Data="@ordersDetails" Pageable="true" PageSize="5" OnRowExpand="@GetProductDetails" Context="details">
                     <GridColumns>
                         <GridColumn Field="@(nameof(OrderDetailsViewModel.ProductName))"></GridColumn>
                         <GridColumn Field="@(nameof(OrderDetailsViewModel.Price))">
@@ -95,8 +68,8 @@
 
                                     <ChartSeriesItems>
                                         <ChartSeries Type="ChartSeriesType.Column" Color="blue"
-                                                     Gap="0.2" VisibleInLegend="false" 
-                                                     Data="@productDetails.OrdersQtys" 
+                                                     Gap="0.2" VisibleInLegend="false"
+                                                     Data="@productDetails.OrdersQtys"
                                                      Field="@nameof(OrdersQty.Quantity)">
                                         </ChartSeries>
                                     </ChartSeriesItems>
@@ -156,18 +129,18 @@
 </TelerikGrid>
 
 @code {
-    Telerik.Blazor.Components.TelerikTabStrip myTabStrip;
+    Telerik.Blazor.Components.TelerikTabStrip orderDetailsTabStrip;
 
-    private IEnumerable<OrderViewModel> lOrders;
+    private IEnumerable<OrderViewModel> orders;
 
-    private IEnumerable<OrderDetailsViewModel> lOrderDetails;
+    private IEnumerable<OrderDetailsViewModel> ordersDetails;
 
     private ProductViewModel productDetails;
 
     async Task OnRowExpandHandler(GridRowExpandEventArgs args)
     {
         OrderViewModel item = args.Item as OrderViewModel;
-        lOrderDetails = ProductsAndOrdersService.GetOrderDetails(item.OrderID);
+        ordersDetails = ProductsAndOrdersService.GetOrderDetails(item.OrderID);
     }
     async Task GetProductDetails(GridRowExpandEventArgs args)
     {
@@ -177,6 +150,6 @@
 
     protected override async Task OnInitializedAsync()
     {
-        lOrders = ProductsAndOrdersService.GetOrders().ToList();
+        orders = await ProductsAndOrdersService.GetOrders();
     }
 }

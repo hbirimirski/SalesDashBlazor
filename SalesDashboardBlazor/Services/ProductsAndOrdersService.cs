@@ -1,4 +1,5 @@
-﻿using SalesDashboardBlazor.Models;
+﻿using Microsoft.EntityFrameworkCore;
+using SalesDashboardBlazor.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -6,13 +7,13 @@ using System.Threading.Tasks;
 
 namespace SalesDashboardBlazor.Services
 {
-    public class ProductsAndOrdersService
+    public class ProductsAndOrdersService : IProductsAndOrdersService
     {
-        public static IQueryable<OrderViewModel> GetOrders()
+        public async Task<List<OrderViewModel>> GetOrders()
         {
             DataAccessLib.NorthwindContext dbContext = new DataAccessLib.NorthwindContext();
 
-            var orders = dbContext.Orders.Select(order => new OrderViewModel
+            var orders = await dbContext.Orders.Select(order => new OrderViewModel
             {
                 CustomerID = order.CustomerId,
                 OrderID = order.OrderId,
@@ -29,12 +30,12 @@ namespace SalesDashboardBlazor.Services
                 ShipAddress = order.ShipAddress,
                 ShipCity = order.ShipCity,
                 ShipPostalCode = order.ShipPostalCode
-            });
+            }).ToListAsync();
 
             return orders;
         }
 
-        public static IQueryable<OrderDetailsViewModel> GetOrderDetails(int orderId)
+        public IQueryable<OrderDetailsViewModel> GetOrderDetails(int orderId)
         {
             DataAccessLib.NorthwindContext dbContext = new DataAccessLib.NorthwindContext();
 
@@ -53,7 +54,7 @@ namespace SalesDashboardBlazor.Services
             return orderDetails;
         }
 
-        public static ProductViewModel GetProductInformation(int productId)
+        public ProductViewModel GetProductInformation(int productId)
         {
             using (DataAccessLib.NorthwindContext dbContext = new DataAccessLib.NorthwindContext())
             {
@@ -84,7 +85,7 @@ namespace SalesDashboardBlazor.Services
             }
         }
 
-        public static string GetCompanies(string country)
+        public string GetCompanies(string country)
         {
             using (DataAccessLib.NorthwindContext dbContext = new DataAccessLib.NorthwindContext())
             {
@@ -238,7 +239,7 @@ namespace SalesDashboardBlazor.Services
             }
         }
 
-        public List<EmployeeViewModel> GetEmployeesList()
+        public async Task<List<EmployeeViewModel>> GetEmployeesList()
         {
             using (DataAccessLib.NorthwindContext dbContext = new DataAccessLib.NorthwindContext())
             {

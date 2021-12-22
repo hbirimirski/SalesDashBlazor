@@ -6,6 +6,9 @@
     Layout = null;
 }
 
+@using Microsoft.AspNetCore.Localization
+@using System.Globalization
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -132,6 +135,13 @@
 
 </head>
 <body>
+
+    @{
+        this.HttpContext.Response.Cookies.Append(CookieRequestCultureProvider.DefaultCookieName,
+            CookieRequestCultureProvider.MakeCookieValue(new RequestCulture(CultureInfo.CurrentCulture, CultureInfo.CurrentUICulture))
+        );
+    }
+
     <component type="typeof(App)" render-mode="ServerPrerendered" />
 
     <div id="blazor-error-ui">

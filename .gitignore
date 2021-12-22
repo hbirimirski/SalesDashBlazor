@@ -1,0 +1,14 @@
+﻿################################################################################
+# This .gitignore file was automatically created by Microsoft(R) Visual Studio.
+################################################################################
+
+/.vs
+/DataAccessLib/bin/Debug/net5.0
+/E2ETests/obj
+/E2ETests/bin/Debug/net5.0
+/SalesDashboardBlazor/bin/Debug/net5.0
+/SalesDashboardTests/bin
+/SalesDashboardTests/obj
+/UnitTests/bin/Debug/netcoreapp3.1
+/UnitTests/obj
+/DataAccessLib/obj/Release/net5.0
