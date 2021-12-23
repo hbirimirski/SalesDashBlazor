@@ -31,19 +31,7 @@
 
 <div id="regional-sales" class="main-section-content row no-gutter">
     <div class="col-xs-12">
-        <div id="map-wrapper" class="row no-gutter">
-            <div id="map-details" class="col-md-2">
-                <h3 class="section-header hidden-xs hidden-sm">Pick a Country to view stats</h3>
-                <h3 class="section-header">COUNTRY</h3>
-                <h2 id="countryName"></h2>
-                <h3 class="section-header">CUSTOMERS</h3>
-                <div id="countryCustomers"><span></span></div>
-            </div>
-            <div id="map-container" class="col-md-10">
-                <div id="map"></div>
-            </div>
-        </div>
-
+        <MapComponent />
         <div id="statsContainer" class="row">
             <div id="marketShareContainer" class="col-md-3 stats-graph">
                 <h3 class="section-header">Market share</h3>
@@ -268,14 +256,6 @@
             Text = "Auto Closable Notification",
             ThemeColor = "Primary"
         });
-    }
-
-    protected override async Task OnAfterRenderAsync(bool firstRender)
-    {
-        if (firstRender)
-        {
-            await JS.InvokeAsync<string>("createMap");
-        }
     }
 
     [JSInvokable]
