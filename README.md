@@ -71,13 +71,12 @@ Instructions to get the project running locally.
 
 This is an example of how to list things you need to use the software and how to install them.
 * Net Core 5
-  ```
- install .net core 5.0
-  ```
 
-  * Restore all packages for solution. Telerik nuget packages may require authentication
+* Restore all packages for solution. Telerik nuget packages may require authentication
 
-  * Restore Northwind db to SQL Server and provide credentials for db connection in NorthwindContext
+* Restore Northwind db to SQL Server and provide credentials for db connection in NorthwindContext
+
+<p align="right">(<a href="#top">back to top</a>)</p>
 
 
 
