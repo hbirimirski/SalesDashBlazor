@@ -1,6 +1,5 @@
 <div id="top"></div>
 
-<!-- PROJECT LOGO -->
 <br />
 <div align="center">
   <a href="https://github.com/hbirimirski/SalesDashBlazor">
@@ -15,7 +14,6 @@
     <br />
   </p>
 </div>
-
 
 
 <!-- TABLE OF CONTENTS -->
@@ -39,14 +37,12 @@
 </details>
 
 
-
 <!-- ABOUT THE PROJECT -->
 ## About The Project
 
 The project is a sample application - sales dashboard creating using Blazor and Telerik Component for Blazor
 
 <p align="right">(<a href="#top">back to top</a>)</p>
-
 
 
 ### Built With
@@ -70,7 +66,7 @@ Instructions to get the project running locally.
 ### Prerequisites
 
 This is an example of how to list things you need to use the software and how to install them.
-* Net Core 5
+* Install Net Core 5
 
 * Restore all packages for solution. Telerik nuget packages may require authentication
 
@@ -83,6 +79,6 @@ This is an example of how to list things you need to use the software and how to
 <!-- LICENSE -->
 ## License
 
-Distributed under the MIT License. See `LICENSE.txt` for more information.
+Distributed under the MIT License.
 
 <p align="right">(<a href="#top">back to top</a>)</p>
