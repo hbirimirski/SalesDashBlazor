@@ -32,7 +32,7 @@
         <h3>TEAM MEMBERS</h3>
         @if (employees.Count == 0)
         {
-            <p><em>Loading...</em></p>
+            <p><em>No data available</em></p>
         }
         else
         {
@@ -72,7 +72,7 @@
                         <h3>Quarter to date sales</h3>
                         @if (quarterToDateSales.Count == 0)
                         {
-                            <p><em>Loading...</em></p>
+                            <p><em>No data available</em></p>
                         }
                         else
                         {
@@ -106,7 +106,7 @@
                         <h3>Monthly Average Sales</h3>
                         @if (employeeAverageSales.Count == 0)
                         {
-                            <p><em>Loading...</em></p>
+                            <p><em>No data available</em></p>
                         }
                         else
                         {
@@ -139,7 +139,7 @@
                 <h3>REPRESENTATIVE SALES VS. TOTAL SALES</h3>
                 @if (employeeComparisonData.Count == 0)
                 {
-                    <p><em>Loading...</em></p>
+                    <p><em>No data available</em></p>
                 }
                 else
                 {
@@ -164,7 +164,7 @@
                 <h3>Representative orders - schedule</h3>
                 @if (Appointments.Count() == 0)
                 {
-                    <p><em>Loading...</em></p>
+                    <p><em>No data available</em></p>
                 }
                 else
                 {
@@ -196,7 +196,7 @@
 
 @code {
 
-    IEnumerable<AppointmentDto> Appointments = new List<AppointmentDto>();
+    List<AppointmentDto> Appointments = new List<AppointmentDto>();
     public DateTime StartDate { get; set; } = new DateTime(2021, 6, 21);
     public SchedulerView CurrView { get; set; } = SchedulerView.Week;
 
@@ -237,12 +237,40 @@
     protected override async Task OnInitializedAsync()
     {
         SetEmployeeQuarterData(0);
+
         employees = await ProductsAndOrdersService.GetEmployeesList();
-        await EmployeeClick(employees.FirstOrDefault());
+        var selectedEmployee = employees.Where(x => x.Selected == "selected").FirstOrDefault();
+
+        if(selectedEmployee != null)
+        {
+            await EmployeeClick(selectedEmployee);
+        }
+    }
+
+    public void SetSampleAppointmentData()
+    {
+        Appointments.Add(new AppointmentDto()
+        {
+            Description = "Meeting description",
+            Id = 1,
+            RoomId = null,
+            Start = StartDate,
+            End = StartDate.AddHours(2),
+            IsAllDay = false,
+            ManagerId = 1,
+            RecurrenceId = 1,
+            EndTimezone = string.Empty,
+            RecurrenceExceptions = string.Empty,
+            RecurrenceRule = string.Empty,
+            StartTimezone = string.Empty,
+            Title = "Meeting"
+        });
     }
 
     public async Task EmployeeClick(EmployeeViewModel employee)
     {
+        SetSampleAppointmentData();
+
         employees = employees.Select(c => { c.Selected = ""; return c; }).ToList();
 
         employee.Selected = "selected";
