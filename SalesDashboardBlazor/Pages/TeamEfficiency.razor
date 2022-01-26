@@ -40,7 +40,7 @@
             {
                 <div class="employee @employee.Selected">
                     <div class="employee-wrapper" @onclick="(() => EmployeeClick(employee))">
-                        <img src="/Content/Employees/@(String.Format("{0}{1}", employee.EmployeeID, ".png"))" class="img-responsive employee-list-image" />
+                        <img src="/Content/Employees/@(String.Format("{0}{1}", employee.EmployeeID, ".png"))" alt="Employee picture" class="img-responsive employee-list-image" />
                         <dl class="employee-list-details">
                             <dt class="name">@employee.EmployeeName</dt>
                             <dd class="title">@employee.Title</dd>
@@ -57,7 +57,7 @@
                     <div id="employeeBio" class="col-md-4">
                         <div>
                             <h3>ABOUT</h3>
-                            <img src="/Content/Employees/@(String.Format("{0}{1}", selectedEmployee.EmployeeID, ".png"))" class="img-responsive employee-details-image" />
+                            <img src="/Content/Employees/@(String.Format("{0}{1}", selectedEmployee.EmployeeID, ".png"))" alt="Employee photo" class="img-responsive employee-details-image" />
                             <dl class="employee-bio-details">
                                 <dt class="name">@selectedEmployee.EmployeeName</dt>
                                 <dd class="title">@selectedEmployee.Title</dd>

@@ -3,7 +3,6 @@
 @inject NavigationManager NavigationManager
 
 <div>
-    <h4>Select your language:</h4>
     <TelerikDropDownList Data="@Cultures"
                          Value="@SelectedCulture"
                          ValueChanged="@((string value) => { OnValueChanged(value); })"

@@ -89,8 +89,8 @@ article, aside, canvas, details, footer, header, section {
 }
 
 #rights {
-    color: #848690;
-    font-size: 10px;
+    color: #fff;
+    font-size: 12px;
     position: absolute;
     bottom: 10px;
     left: 15px;
@@ -99,8 +99,8 @@ article, aside, canvas, details, footer, header, section {
 #dash-logo {
     font-size: 18px;
     text-transform: uppercase;
-    color: #fff;
-    background-color: #1996e4;
+    color: black;
+    background-color: white;
     text-align: center;
     padding: 30px 0;
 }
@@ -396,14 +396,14 @@ div.RadMap div.k-navigator {
 .title {
     font-size: 9px;
     line-height: 9px;
-    color: #8a8b8f;
+    color: #35373d;
     text-transform: uppercase;
     display: inline-block;
 }
 
 .selected .name,
 .selected .title {
-    color: #fff;
+    color: #35373d;
 }
 
 .phone {
@@ -414,7 +414,7 @@ div.RadMap div.k-navigator {
 
 .k-state-selected .name,
 .k-state-selected .title {
-    color: #fff;
+    color: #35373d;
 }
 
 .bioTooltip {
@@ -787,9 +787,13 @@ div.RadMap div.k-navigator {
     background-color: #fff;
 }
 
+.section-dark-blue {
+    color: darkblue;
+}
+
 .download-btn {
-    color: #fff;
-    background-color: #ee5315;
+    color: #35373d;
+    background-color: white;
     border: 1px solid #ee5315;
     background-clip: padding-box;
     position: relative;
